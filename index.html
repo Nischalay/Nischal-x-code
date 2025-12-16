@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Location Tracker (With Permission)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #020617;
+      padding: 25px;
+      border-radius: 14px;
+      width: 320px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    h1 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 14px;
+      opacity: 0.85;
+    }
+    button {
+      margin-top: 15px;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 10px;
+      background: #22c55e;
+      color: #052e16;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #475569;
+      color: #cbd5f5;
+      cursor: not-allowed;
+    }
+    .output {
+      margin-top: 15px;
+      font-size: 13px;
+      text-align: left;
+      background: #020617;
+      padding: 10px;
+      border-radius: 8px;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📍 Location Tracker</h1>
+    <p>This site will ask permission to access your location.
+       Your location is only shown on your screen.</p>
+
+    <button id="getLocation">Allow & Get Location</button>
+
+    <div class="output" id="output">Waiting for permission...</div>
+  </div>
+
+  <script>
+    const btn = document.getElementById('getLocation');
+    const output = document.getElementById('output');
+
+    btn.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        output.innerHTML = 'Geolocation is not supported by your browser.';
+        return;
+      }
+
+      btn.disabled = true;
+      output.innerHTML = 'Requesting permission...';
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          const accuracy = position.coords.accuracy;
+
+          output.innerHTML = `
+            <strong>Permission Granted ✅</strong><br><br>
+            Latitude: ${lat}<br>
+            Longitude: ${lon}<br>
+            Accuracy: ±${accuracy} meters<br><br>
+            <a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank" style="color:#22c55e">View on Google Maps</a>
+          `;
+        },
+        (error) => {
+          btn.disabled = false;
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              output.innerHTML = '❌ Permission denied by user.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              output.innerHTML = 'Location information unavailable.';
+              break;
+            case error.TIMEOUT:
+              output.innerHTML = 'Location request timed out.';
+              break;
+            default:
+              output.innerHTML = 'An unknown error occurred.';
+          }
+        }
+      );
+    });
+  </script>
+</body>
+</html>index.html
